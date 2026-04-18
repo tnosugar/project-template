@@ -1,0 +1,22 @@
+# scripts/sync-manifest.txt
+#
+# Paths that are authoritative from tnosugar/project-template and kept in sync
+# by scripts/sync-conventions.sh. When sync-conventions.sh runs, each path
+# below is fetched from the source repo's main branch and (after a diff +
+# confirmation prompt) copied into this project, overwriting the local copy.
+#
+# Rules:
+# - Blank lines and lines starting with # are ignored.
+# - Paths are repo-relative.
+# - Files listed here should NOT be edited directly in a consumer project
+#   (changes get overwritten on next sync). To modify, open a PR against
+#   tnosugar/project-template and then re-run the sync in each consumer.
+# - INDEX.md files, CLAUDE.md, .sync-public.yml, README.md, docs/, website/,
+#   brand/ contents, and any project-specific files are intentionally NOT in
+#   this manifest — each project owns them.
+
+.claude/conventions.md
+.github/workflows/sync-public.yml
+.gitignore
+scripts/sync-conventions.sh
+scripts/sync-manifest.txt
