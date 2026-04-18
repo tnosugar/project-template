@@ -1,0 +1,135 @@
+name: Sync to public mirror
+
+# Mirrors a curated subset of this private repo to its paired public
+# mirror. Naming convention: this repo is {project}-private, its
+# mirror is {project}-public — the workflow derives the target from
+# GITHUB_REPOSITORY automatically, so no edits are needed here when
+# used via the template.
+#
+# Triggers:
+#   - on every push to main (automatic propagation)
+#   - on manual workflow_dispatch (re-run without a new commit)
+#
+# Files synced are defined in /.sync-public.yml at the repo root.
+# Files listed under `preserve:` are NOT overwritten or deleted in
+# the public repo.
+#
+# Auth: writes to the public mirror via an SSH deploy key whose
+# private half is stored as the PUBLIC_REPO_DEPLOY_KEY secret on
+# this repo; the public half must be installed as a deploy key WITH
+# WRITE ACCESS on the public mirror repo.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: sync-public
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Derive target repo from GITHUB_REPOSITORY
+        id: target
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REPOSITORY}" != *-private ]]; then
+            echo "ERROR: GITHUB_REPOSITORY='${GITHUB_REPOSITORY}' does not end in '-private'."
+            echo "This workflow expects the {project}-private / {project}-public naming convention."
+            exit 1
+          fi
+          TARGET="${GITHUB_REPOSITORY%-private}-public"
+          echo "target=${TARGET}" >> "$GITHUB_OUTPUT"
+          echo "Target public repo: ${TARGET}"
+
+      - name: Check out private repo
+        uses: actions/checkout@v4
+        with:
+          path: private
+          fetch-depth: 1
+
+      - name: Parse manifest
+        run: |
+          python3 - <<'PY'
+          import yaml, pathlib
+          with open('private/.sync-public.yml') as f:
+              m = yaml.safe_load(f) or {}
+          include  = [p.strip() for p in (m.get('include')  or []) if p and p.strip()]
+          preserve = [p.strip() for p in (m.get('preserve') or []) if p and p.strip()]
+          pathlib.Path('include.txt').write_text('\n'.join(include) + '\n')
+          pathlib.Path('preserve.txt').write_text('\n'.join(preserve) + '\n')
+          print(f'Include ({len(include)}):')
+          for p in include:  print(f'  {p}')
+          print(f'Preserve ({len(preserve)}):')
+          for p in preserve: print(f'  {p}')
+          PY
+
+      - name: Check out public repo (deploy key)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.target.outputs.target }}
+          path: public
+          ssh-key: ${{ secrets.PUBLIC_REPO_DEPLOY_KEY }}
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Mirror manifest into public
+        run: |
+          set -euo pipefail
+          cd public
+          git ls-files > /tmp/public-tracked.txt || true
+          cd ..
+
+          python3 - <<'PY'
+          import shutil, pathlib
+          include  = [l.strip() for l in open('include.txt')  if l.strip()]
+          preserve = [l.strip() for l in open('preserve.txt') if l.strip()]
+          tracked  = [l.strip() for l in open('/tmp/public-tracked.txt') if l.strip()]
+
+          include_set  = set(include)
+          preserve_set = set(preserve)
+
+          # 1. Remove public files that should no longer be there.
+          for rel in tracked:
+              if rel in include_set or rel in preserve_set:
+                  continue
+              p = pathlib.Path('public') / rel
+              if p.exists():
+                  p.unlink()
+
+          # 2. Copy each include path from private -> public.
+          missing = []
+          for rel in include:
+              src = pathlib.Path('private') / rel
+              dst = pathlib.Path('public') / rel
+              if not src.exists():
+                  missing.append(rel)
+                  continue
+              dst.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(src, dst)
+
+          if missing:
+              print('ERROR: manifest lists paths that do not exist in the private repo:')
+              for m in missing:
+                  print(f'  {m}')
+              raise SystemExit(1)
+          PY
+
+      - name: Commit and push to public
+        run: |
+          set -euo pipefail
+          cd public
+          git config user.name  "sync-bot"
+          git config user.email "sync@local"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to sync."
+            exit 0
+          fi
+          SHORT_SHA="$(cd ../private && git rev-parse --short HEAD)"
+          PRIVATE_REPO="${GITHUB_REPOSITORY##*/}"
+          git commit -m "Sync from ${PRIVATE_REPO} @ ${SHORT_SHA}"
+          git push origin HEAD:main

@@ -1,0 +1,9 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+
+# Temporary, sensitive files that must never be committed.
+# Created and deleted ad hoc when rotating the public-repo sync key
+# (see CLAUDE.md §N "Two-Repo Pattern").
+.public-repo-deploy-key
+.public-repo-deploy-key.pub

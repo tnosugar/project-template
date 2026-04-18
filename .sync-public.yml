@@ -1,0 +1,33 @@
+# .sync-public.yml
+#
+# Manifest of paths that sync from this private repo to its public
+# mirror. Anything not listed here stays private. Grow or shrink the
+# public surface area by editing this file, committing, and pushing —
+# the sync workflow runs on every push to main.
+#
+# The workflow derives the target repo from GITHUB_REPOSITORY by
+# stripping "-private" and appending "-public" (see
+# .github/workflows/sync-public.yml). Naming convention is enforced
+# there, so a repo called foo-private always syncs to foo-public.
+#
+# Canonical paths are source-of-truth docs (docs/*.md). Under Pages,
+# Jekyll renders *.md to *.html at serve time, which is why HTML
+# pages link to ../docs/<file>.html and the markdown goes public
+# alongside them when it's meant to be referenced externally.
+
+include:
+  - web/home.html
+  # Add more paths as the project grows. Examples:
+  # - web/how-we-work.html
+  # - web/some-explainer.html
+  # - docs/some-canonical-doc.md
+
+# Files to keep in the public repo that are NOT synced from the
+# private repo. The sync workflow leaves these alone. Use this for:
+# - A README specific to the public mirror
+# - .nojekyll, CNAME, or other Pages config
+# - Any file that belongs only in public
+preserve:
+  - README.md
+  - .nojekyll
+  - CNAME
