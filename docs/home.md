@@ -1,3 +1,12 @@
+---
+title: Home page spec
+type: spec
+status: draft
+last_updated: 2026-04-18
+related: []
+renders_to: [website/home.html]
+---
+
 # Home
 
 ## What It Is

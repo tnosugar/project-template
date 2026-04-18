@@ -10,17 +10,18 @@
 # .github/workflows/sync-public.yml). Naming convention is enforced
 # there, so a repo called foo-private always syncs to foo-public.
 #
-# Canonical paths are source-of-truth docs (docs/*.md). Under Pages,
-# Jekyll renders *.md to *.html at serve time, which is why HTML
-# pages link to ../docs/<file>.html and the markdown goes public
-# alongside them when it's meant to be referenced externally.
+# docs/ is PRIVATE ONLY — never include docs/ paths here. This
+# manifest is purely for channel-folder artifacts that should be
+# publicly mirrored (typically website/ pages; occasionally a specific
+# deliverable from another channel, like a publicly shared deck).
 
 include:
-  - web/home.html
+  - website/home.html
   # Add more paths as the project grows. Examples:
-  # - web/how-we-work.html
-  # - web/some-explainer.html
-  # - docs/some-canonical-doc.md
+  # - website/how-we-work.html
+  # - website/blog/some-post.html
+  # - decks/public-pitch.pdf
+  # Never add docs/ paths — docs is private only.
 
 # Files to keep in the public repo that are NOT synced from the
 # private repo. The sync workflow leaves these alone. Use this for:

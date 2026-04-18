@@ -43,19 +43,26 @@ project-template/
 ├── .github/
 │   └── workflows/
 │       └── sync-public.yml               # Sync workflow (generalized; derives target from repo name)
-├── docs/
-│   └── home.md                           # Home page spec with Socratic prompts
-└── web/
-    └── home.html                         # Minimal single-file home with main-nav scaffolding
+├── docs/                                 # PRIVATE ONLY — canonical written content
+│   ├── INDEX.md                          # Entry point for canonical content
+│   └── home.md                           # Home page spec with frontmatter + Socratic prompts
+├── website/                              # Project website (served by Pages via the public mirror)
+│   ├── INDEX.md
+│   └── home.html                         # Minimal single-file home with main-nav scaffolding
+└── brand/                                # Brand asset files (logos, palette, fonts) — guidelines in docs/brand/
+    └── INDEX.md
 ```
 
 ## Conventions enforced by the template
 
 - Repos follow the `{project}-private` / `{project}-public` naming convention. The sync workflow derives the target repo from `GITHUB_REPOSITORY`.
-- `docs/` is the source of truth; `web/` renders from it. Copy in `web/` must not drift from `docs/`.
-- HTML pages are single-file, no build step, inline CSS/JS.
-- Every HTML page in `web/` shares a common main-nav block with links to siblings.
-- GitHub Pages runs Jekyll by default on the public mirror, so `docs/*.md` is served as `docs/*.html`.
+- `docs/` is PRIVATE ONLY — all canonical written content (strategy, research, briefs, decisions, copy drafts, brand guidelines, process docs) lives here with YAML frontmatter. Never listed in `.sync-public.yml`.
+- Channel folders (`website/`, `brand/`, `ads/`, `social/`, `email/`, `sms/`, `messenger/`, `decks/`, `app/`) hold rendered or semi-rendered deliverables. Canonical names defined in `CLAUDE.md` §2; created on demand. Public artifacts (typically just `website/`) appear in the manifest.
+- Within each channel, organize by platform first (e.g. `ads/google/`, `social/linkedin/`), then by campaign. Text content for the channel is canonical in `docs/copy/{channel}/`; the channel folder holds the rendered artifact.
+- The "split at three" rule applies universally: when a category reaches three files, promote to a subfolder with its own `INDEX.md`.
+- `INDEX.md` at every level — entry points listing immediate contents with one-line descriptions.
+- Every markdown doc in `docs/` carries frontmatter (`title`, `type`, `status`, `last_updated`, `related`, optional `renders_to`) so a future knowledge graph can read cross-folder relationships without relying on folder hierarchy.
+- HTML pages in `website/` are single-file, no build step, inline CSS/JS, shared main-nav block.
 
 ## Editing the template itself
 

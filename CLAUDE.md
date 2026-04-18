@@ -71,9 +71,9 @@ Keep §5 Web Asset Conventions, §7 Working Agreement, §8 Decisions Logged, §9
 
 ### Step 5 — Update the README, manifest, and home assets
 
-- Replace `[TBD — Project Name]` markers throughout `README.md`, `docs/home.md`, and `web/home.html`.
-- Edit `.sync-public.yml` to reflect what should be public for this project.
-- Run a first pass on `docs/home.md` and `web/home.html` to fill in the placeholders that have firm answers.
+- Replace `[TBD — Project Name]` markers throughout `README.md`, `docs/home.md`, and `website/home.html`.
+- Edit `.sync-public.yml` to reflect what should be public for this project (only channel-folder paths; `docs/` is private only).
+- Run a first pass on `docs/home.md` and `website/home.html` to fill in the placeholders that have firm answers.
 
 ### Step 6 — Commit, push, verify
 
@@ -113,19 +113,79 @@ Once everything above is done, remove §0 entirely from this file and renumber t
 ├── .github/
 │   └── workflows/
 │       └── sync-public.yml                # GitHub Action that mirrors manifest paths to the public repo
-├── docs/                                  # Strategy, framework, and source copy (markdown)
-│   └── home.md                            # Home page spec and canonical copy
-└── web/                                   # Standalone HTML assets
-    └── home.html                          # Home page (rendered from home.md)
+├── docs/                                  # PRIVATE ONLY — canonical written content
+│   ├── INDEX.md
+│   └── home.md
+├── website/                               # The project's website — served by Pages via the public mirror
+│   ├── INDEX.md
+│   └── home.html
+├── brand/                                 # Brand asset FILES (logos, palette, fonts) — guidelines in docs/brand/
+│   └── INDEX.md
+└── [channel folders]                      # Created on demand — see "Top-level channel folders" below
 ```
 
-`docs/` is the source of truth for language. `web/` translates that language into rendered pages and (where relevant) interactive explainers. If copy in `web/` ever drifts from `docs/`, `docs/` wins and `web/` is updated to match. All pages in `web/` share a common main nav — see §5.
+**The two halves of the repo.** This spec distinguishes private canonical content from channel deliverables:
 
-**Two-repo structure.** This (`{project}-private`) is the working repo — everything produced lives here. A paired public mirror (`{project}-public`) holds only the subset listed in `.sync-public.yml`, and is the repo that GitHub Pages actually serves. See §10 for the full pattern and the sync mechanism.
+- **`docs/` is private by default and stays that way.** It holds canonical written content — strategy, research, briefs, decisions, all copy drafts and final approved text, brand guidelines, process docs. **Nothing in `docs/` is ever added to `.sync-public.yml`.** When Claude writes final text for a channel (e.g. a LinkedIn post), the text lives in `docs/copy/{channel}/`; only the rendered or published artifact (screenshot, archive PDF, scheduled send config) lives in the channel folder.
+- **Channel folders (including `website/`) hold deliverables.** Each top-level folder corresponds to a distinct channel or asset type. Paths here are candidates for `.sync-public.yml` when the artifact is publicly publishable (typically just `website/` content, occasionally a public deck). Non-public channels (ads creative, internal email sends, drafts in progress) stay private by never being listed in the manifest.
 
-<!-- As the project adds more docs and web assets, extend the tree above to keep
-     it accurate. New entries should preserve the docs/ source-of-truth ↔ web/
-     rendering relationship described below the tree. -->
+### Top-level channel folders
+
+Created on demand. When a project needs a channel that doesn't yet exist, create the folder with an INDEX.md before adding content. Use these canonical names rather than synonyms:
+
+- **`website/`** — the project's primary web presence, served via GitHub Pages. One HTML file per page, shared main nav, single-file (see §5 Website Conventions).
+- **`brand/`** — brand asset FILES (`logo.svg`, `palette.json`, `fonts/`, `icons/`). Brand GUIDELINES (written voice, visual principles, usage rules) live in `docs/brand/` — this folder is just the physical assets every channel references with paths like `../brand/logo.svg`.
+- **`ads/`** — digital advertising. Organize by platform first: `ads/google/`, `ads/linkedin/`, `ads/meta/`. Each platform holds campaigns: `ads/google/q2-launch/`. Creative lives here; ad copy (canonical text) lives in `docs/copy/ads/`.
+- **`social/`** — social media posts. Organize by platform first: `social/linkedin/`, `social/x/`, `social/instagram/`. Each platform holds posts by campaign or chronologically. Post text (canonical) lives in `docs/copy/social/`.
+- **`email/`** — email campaigns. Rendered HTML templates, plain-text fallbacks, send logs. Campaign copy (canonical) lives in `docs/copy/email/`.
+- **`sms/`** — SMS campaigns. Message text (canonical) lives in `docs/copy/sms/`; send logs and per-platform configs live here.
+- **`messenger/`** — messenger (WhatsApp, iMessage, Messenger, etc.) assets and conversation flows.
+- **`decks/`** — slide decks (`.pptx`, `.pdf`). Outline and speaker notes (canonical) live in `docs/copy/decks/`.
+- **`app/`** — application source code for marketing apps. Treat as a normal software project inside this folder.
+
+When a channel is needed that doesn't fit any of the above, add a new top-level folder following the same pattern (singular lowercase name, platform-then-campaign nesting, INDEX.md at every level) and log it in §8 (Decisions Logged) so future projects inherit the name.
+
+### Canonical subfolders in docs/
+
+When `docs/` reaches the "split at three" threshold in a category, promote to a subfolder. Use these names:
+
+- `docs/strategy/` — strategic positioning, market analysis, business framing
+- `docs/research/` — source material, interviews, reading notes, raw inputs
+- `docs/copy/` — all canonical text destined for external channels. Organize by channel: `docs/copy/social/`, `docs/copy/email/`, `docs/copy/ads/`, `docs/copy/decks/`, `docs/copy/website/`, `docs/copy/sms/`. Within social/ads/sms, nest by platform: `docs/copy/social/linkedin/post-q2-launch.md`.
+- `docs/briefs/` — short briefs that direct production work (deck briefs, campaign briefs, design briefs)
+- `docs/decisions/` — long-form decision records that exceed what fits in §8 below
+- `docs/brand/` — brand guidelines (voice, visual principles, usage rules). Asset files live in top-level `brand/`.
+- `docs/process/` — organizational process design docs (for internal/external communications)
+
+### Universal conventions
+
+**Split at three.** When a category at any level reaches three files, promote to a subfolder of the same canonical name and create an `INDEX.md` inside it. Applies inside `docs/`, inside any channel folder, inside any platform folder. Claude performs splits automatically when the threshold is crossed; if moved files are referenced from elsewhere or in the manifest, surface the move to the user first.
+
+**INDEX.md at every level.** Every folder under `docs/` and every channel folder has an `INDEX.md` listing its immediate contents (subfolders and files) with one-line descriptions, and pointing outward to child INDEX.md files. Updated whenever files are added, moved, or retired. Subfolders get their own INDEX.md the moment they're created.
+
+**Frontmatter on docs.** Every markdown file in `docs/` (excluding `INDEX.md` files) starts with a YAML frontmatter block:
+
+```yaml
+---
+title: Home page spec
+type: spec               # strategy | research | copy | brief | decision | brand | process | spec | log
+status: draft            # draft | review | final | archived
+last_updated: 2026-04-18
+related: []              # repo-relative paths to related docs
+renders_to: [website/home.html]   # optional; omit if this doc has no rendered artifact
+---
+```
+
+The `related:` and `renders_to:` lists are the substrate for a future knowledge graph that connects `docs/` content to channel-folder artifacts across the repo. Folders organize content for humans; frontmatter organizes it for the graph. `type` matches the canonical subfolder this doc lives in (or would live in if split out). Update `last_updated` whenever the body changes meaningfully.
+
+For `docs/copy/` entries specifically, a doc may also carry `channel:` (social | email | ads | sms | decks | website) and `platform:` (linkedin | x | google | meta | …) when those aren't already implicit in the path — useful for graph queries that span channels.
+
+**Two-repo structure.** This (`{project}-private`) is the working repo — everything produced lives here. A paired public mirror (`{project}-public`) holds only the subset listed in `.sync-public.yml`, and is the repo that GitHub Pages actually serves. **`docs/` is never synced.** See §10 for the full pattern.
+
+<!-- As the project grows — more docs subfolders, new channels, more campaigns
+     within a channel — extend the tree above and keep the relevant INDEX.md
+     files current. Preserve the docs/ ↔ channel boundary: canonical text
+     belongs in docs/copy/{channel}/, artifacts belong in the channel folder. -->
 
 ---
 
@@ -180,27 +240,28 @@ aloud to [a specific reader profile]?" — at the end of the section.]
 
 ---
 
-## 5. Web Asset Conventions
+## 5. Website Conventions
 
-The `web/*.html` files are standalone, single-file HTML assets. Treat these conventions as the baseline unless a specific task overrides them:
+The `website/*.html` files are standalone, single-file HTML pages served by GitHub Pages via the public mirror (see §10). These conventions apply to website pages specifically; other channels (`email/`, `ads/`, `decks/`, etc.) have their own conventions that get added as new sections below §5 when those channels are first used.
 
-- **Current deployment model: a home page plus standalone explainers, hosted on GitHub Pages, connected by a shared main nav.** Each HTML file stands on its own — no server-side includes, no shared shell — but every page in `web/` carries the same top nav block (see "Main nav convention" below) so a reader can move between pages from any starting point. Over time these will evolve into final site pages; until then the pages remain single-file and self-contained.
-- **Main nav convention.** Every HTML file in `web/` starts with the same nav. Left side is a text brand that links to `./home.html`. Right side is one link per sibling page (`./home.html`, `./<other-page>.html`, …). The current page marks its own item with `class="site-nav-link active" aria-current="page"`. CSS lives inline in each file under a `/* ---------- Main nav ---------- */` block. If a page sets `body { padding }`, the nav uses negative margins to render edge-to-edge; if not, it uses regular padding. When a new page is added to `web/`, extend the nav across all files.
-- **Internal link extensions under Pages.** Pages runs Jekyll by default, which serves `docs/*.md` as `docs/*.html`. Internal `href`s from `web/*.html` to canonical docs use the `.html` extension (e.g. `../docs/home.html`). The `.md` files remain the source of truth in the repo; the `.html` is what Pages produces at serve time. If Jekyll is ever disabled (via a `.nojekyll` file) these links need to revert to `.md`.
-- **One file, no build step.** Inline `<style>` and `<script>`, single Google Fonts import (Inter), no external JS dependencies.
-- **Font:** Inter (300/400/500/600/700) with `system-ui, sans-serif` fallback.
-- **Background:** `#f8fafc`. **Primary text:** `#0f172a`. **Muted text:** `#64748b` / `#94a3b8`.
+- **Deployment model: a home page plus standalone explainers, connected by a shared main nav.** Each HTML file stands on its own — no server-side includes, no shared shell — but every page in `website/` carries the same top nav block (see "Main nav convention" below) so a reader can move between pages from any starting point. Pages may evolve into a more traditional site over time; until then they remain single-file and self-contained.
+- **Main nav convention.** Every HTML file in `website/` starts with the same nav. Left side is a text brand linking to `./home.html`. Right side is one link per sibling page (`./home.html`, `./<other-page>.html`, …). The current page marks its own item with `class="site-nav-link active" aria-current="page"`. CSS lives inline under a `/* ---------- Main nav ---------- */` block. If a page sets `body { padding }`, the nav uses negative margins to render edge-to-edge; otherwise regular padding. When a new page is added, extend the nav across all files.
+- **Internal links.** Use relative `./<page>.html` links between website pages. Website pages never link into `docs/` because `docs/` is private — never synced to the public mirror.
+- **Brand assets.** When a page needs a logo, palette value, or brand font file, reference it from `../brand/` (e.g. `<img src="../brand/logo.svg">`, `<link rel="icon" href="../brand/favicon.ico">`). Brand GUIDELINES that describe how to use those assets live in `docs/brand/` — not linked from website pages, since docs is private.
+- **One file, no build step.** Inline `<style>` and `<script>`, single Google Fonts import (Inter by default), no external JS dependencies.
+- **Font:** Inter (300/400/500/600/700) with `system-ui, sans-serif` fallback — override with the project's brand typography once `brand/` and `docs/brand/` are filled in.
+- **Background:** `#f8fafc`. **Primary text:** `#0f172a`. **Muted text:** `#64748b` / `#94a3b8`. Override with the brand palette from `brand/palette.json` once defined.
 - **Diagrams in inline SVG**, with `onclick` handlers calling named JS functions that reveal a detail panel below the diagram (when interactivity is needed).
 - **Data lives in JS objects** at the top of the script block so copy edits are localized and obvious.
 - **Viewport-responsive**, with one `@media (max-width: 720px)` fallback where needed.
 - **No browser storage APIs** (no localStorage/sessionStorage).
-- **Attribution line** at the bottom: "A project by **[Project Name]**" with an optional link back to the canonical `docs/*.md`.
+- **Attribution line** at the bottom: "A project by **[Project Name]**".
 
-When adding a new web asset: mirror an existing one's structure rather than inventing a new pattern.
+When adding a new website page: mirror an existing one's structure rather than inventing a new pattern.
 
 <!-- SOCRATIC ADDITION: Once the project has a brand visual system (palette,
-     logo, typography), replace the generic Inter / slate palette references
-     above with the project's actual values. Until then, leave the defaults. -->
+     logo, typography) populated in brand/ and docs/brand/, replace the generic
+     Inter / slate palette references above with the project's actual values. -->
 
 ---
 
@@ -229,7 +290,7 @@ Practical implications:
 2. **Propose, don't assume.** When a decision is needed that isn't covered by this spec, surface the decision explicitly with 2–3 reasoned options rather than picking silently.
 3. **Small steps, visible reasoning.** Prefer short cycles — draft a section, check alignment, expand — over one large generation.
 4. **Update this spec as decisions land.** When a new convention, naming decision, or framework refinement is made, add it here so future sessions inherit it.
-5. **Source-of-truth discipline.** Language lives in `docs/`. Visual/interactive rendering lives in `web/`. If they drift, update `docs/` first and bring `web/` into alignment, not the other way around.
+5. **Source-of-truth discipline.** Canonical written content lives in `docs/` (private, with frontmatter). Channel folders (`website/`, `ads/`, `social/`, `email/`, `decks/`, etc.) render or reference that canonical content. If a channel artifact drifts from its `docs/` source, update `docs/` first and bring the artifact into alignment, not the other way around. Keep each folder's `INDEX.md` current when files are added, moved, or retired. Never add `docs/` paths to `.sync-public.yml` — docs is private only.
 6. **Verify before declaring done.** For any non-trivial change, include a verification step: re-read the changed file, diff against the source `docs/` copy, or view the rendered HTML.
 
 ---
@@ -291,7 +352,7 @@ The workflow writes to `{project}-public` via an SSH deploy key:
 
 Pages serves from `{project}-public` (`main` / root). URLs keep the repo nesting:
 
-- Home: `https://{owner}.github.io/{project}-public/web/home.html`
+- Home: `https://{owner}.github.io/{project}-public/website/home.html`
 - (Add more here as the project grows.)
 
 ### Operating rules
