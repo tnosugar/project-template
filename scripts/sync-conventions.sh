@@ -135,8 +135,10 @@ show_diff() {
   echo "---- end ----"
 }
 
-for path in "${NEW[@]}";     do show_diff "$path" "NEW"; done
-for path in "${CHANGED[@]}"; do show_diff "$path" "CHANGED"; done
+# Bash 3.2 (macOS default) raises "unbound variable" under `set -u` when
+# expanding an empty declared array with "${arr[@]}". Guard each iteration.
+if [[ ${#NEW[@]}     -gt 0 ]]; then for path in "${NEW[@]}";     do show_diff "$path" "NEW"; done; fi
+if [[ ${#CHANGED[@]} -gt 0 ]]; then for path in "${CHANGED[@]}"; do show_diff "$path" "CHANGED"; done; fi
 
 TOTAL=$(( ${#NEW[@]} + ${#CHANGED[@]} ))
 if [[ $TOTAL -eq 0 ]]; then
@@ -175,8 +177,8 @@ copy_one() {
   echo "WROTE: $path"
 }
 
-for path in "${NEW[@]}";     do copy_one "$path"; done
-for path in "${CHANGED[@]}"; do copy_one "$path"; done
+if [[ ${#NEW[@]}     -gt 0 ]]; then for path in "${NEW[@]}";     do copy_one "$path"; done; fi
+if [[ ${#CHANGED[@]} -gt 0 ]]; then for path in "${CHANGED[@]}"; do copy_one "$path"; done; fi
 
 echo
 echo "Done. Review with 'git diff' and commit when ready."
