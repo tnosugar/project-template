@@ -11,9 +11,9 @@ renders_to: [website/home.html]
 
 ## What It Is
 
-The home page is the project's first front door. It introduces who you are, shows the work, names the people behind it, and invites a first conversation — all in one continuous scroll. Every piece of language on the page is either drawn directly from canonical docs in `docs/` or, where the page introduces new language, defined here.
+The home page is the project's first front door. It introduces who you are, shows the work, names the people behind it, and invites a first conversation — all in one continuous scroll. Every piece of language on the page is either drawn directly from canonical content in `content/` or, where the page introduces new language, defined here.
 
-This document is both the content source and the structural spec for `web/home.html`. Sections below appear in the order they are encountered on the page.
+This document is both the content source and the structural spec for `website/home.html`. Sections below appear in the order they are encountered on the page.
 
 <!-- SOCRATIC: Before writing any of the sections below, establish with the user:
      - What the organization does in one sentence.
@@ -62,7 +62,7 @@ This document is both the content source and the structural spec for `web/home.h
 
 <!-- SOCRATIC: Ask whether the org has named frameworks or a named working method
      worth surfacing on the home page. If yes, each framework gets a short
-     summary block here plus a link to its own explainer page under web/.
+     summary block here plus a link to its own explainer page under website/.
      If no, drop this section entirely. -->
 
 [TBD — frameworks/methods, or drop section.]
@@ -85,7 +85,7 @@ This document is both the content source and the structural spec for `web/home.h
 
 <!-- SOCRATIC: Ask whether the organization has defined values or a point-of-view block
      worth surfacing on the home page. If yes: list them with canonical wording
-     (source from docs/). If no: drop this section or replace with a single narrative
+     (source from content/). If no: drop this section or replace with a single narrative
      paragraph that captures the stance. -->
 
 [TBD — values/POV, or drop section.]
