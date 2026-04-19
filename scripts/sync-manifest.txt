@@ -16,6 +16,7 @@
 #   this manifest — each project owns them.
 
 .claude/conventions.md
+.claude/SCHEMA.md
 .github/workflows/sync-public.yml
 .gitignore
 scripts/sync-conventions.sh

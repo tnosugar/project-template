@@ -80,22 +80,41 @@ When `docs/` reaches the "split at three" threshold in a category, promote to a 
 
 **INDEX.md at every level.** Every folder under `docs/` and every channel folder has an `INDEX.md` listing its immediate contents (subfolders and files) with one-line descriptions, and pointing outward to child INDEX.md files. Updated whenever files are added, moved, or retired. Subfolders get their own INDEX.md the moment they're created.
 
-**Frontmatter on docs.** Every markdown file in `docs/` (excluding `INDEX.md` files) starts with a YAML frontmatter block:
+**Frontmatter on docs.** Every markdown file in `docs/` (excluding `INDEX.md` files) starts with a YAML frontmatter block. The schema has two layers: **core fields** (present on every doc) and **typed graph fields** (optional today, used where applicable; required for graph-relevant entities when the knowledge graph is built).
 
 ```yaml
 ---
+# Core fields (present on every doc):
 title: Home page spec
 type: spec               # strategy | research | copy | brief | decision | brand | process | spec | log
 status: draft            # draft | review | final | archived
 last_updated: 2026-04-18
-related: []              # repo-relative paths to related docs
 renders_to: [website/home.html]   # optional; omit if this doc has no rendered artifact
+related: []              # see-also / peer associations that don't fit a typed edge below
+
+# Typed graph fields (optional; fill in when applicable):
+entity: project          # project | organization | person | content | topic | measurement
+client: []               # paths to organization entities this doc is for
+project: []              # paths to project entities this doc belongs to
+topics: []               # paths to topic entities this doc covers
+people: []               # paths to person entities (author, reviewer, subject)
+published: 2026-04-19    # publication date of the artifact, distinct from last_updated
 ---
 ```
 
-The `related:` and `renders_to:` lists are the substrate for a future knowledge graph that connects `docs/` content to channel-folder artifacts across the repo. Folders organize content for humans; frontmatter organizes it for the graph. `type` matches the canonical subfolder this doc lives in (or would live in if split out). Update `last_updated` whenever the body changes meaningfully.
+`type:` matches the canonical subfolder this doc lives in (or would live in if split out); it describes what kind of *document* this is. `entity:` names what kind of *thing in the world* the doc represents; it is optional and only set on graph-relevant docs. `type:` and `entity:` sit at different levels and both can be present.
 
-For `docs/copy/` entries specifically, a doc may also carry `channel:` (social | email | ads | sms | decks | website) and `platform:` (linkedin | x | google | meta | …) when those aren't already implicit in the path — useful for graph queries that span channels.
+For `docs/copy/` entries specifically, a doc may also carry `channel:` (social | email | ads | sms | decks | website) and `platform:` (linkedin | x | google | meta | …) when those aren't already implicit in the path, useful for graph queries that span channels.
+
+The authoritative definitions of entity types, edge types, and per-entity required fields live in `.claude/SCHEMA.md`. This block shows the common shape; SCHEMA.md is the reference.
+
+**Typed fields vs `related[]`.** If a relationship fits a typed field (`client:`, `topics:`, `project:`, `people:`, etc.), it goes in that field. `related[]` is the untyped fallback for peer associations that don't fit any named edge: "these two canonical docs are mutually relevant but not in a named semantic relationship." When a query tool walks the graph, typed fields give it named edges to traverse; `related[]` gives it "see also." Don't use `related[]` for things that have a typed home, or the typed edges silently get shadowed.
+
+**Bidirectionality.** Typed and untyped cross-references are maintained **bidirectionally by hand** until a graph tool exists to audit asymmetries. If `a.md` lists `b.md` in `related[]` (or any typed field), `b.md` lists `a.md` on the reciprocal side. One-sided references read as broken rather than intentionally asymmetric once the graph tool can see them.
+
+**Body links vs frontmatter links.** Inline links in the body (`[see ...](path/to/foo.md)`) are for prose narrative and are not indexed as graph edges. If a link represents a relationship you would ever want to query on, it also belongs in the frontmatter (typed field if one fits, `related[]` otherwise). Body-only links are fine for narrative shortcuts; frontmatter is the structured index.
+
+Update `last_updated` whenever the body changes meaningfully; update `published` only when the artifact goes (or re-goes) live.
 
 **Two-repo structure.** The working repo (`{project}-private`) holds everything produced; a paired public mirror (`{project}-public`) holds only the subset listed in `.sync-public.yml`. Pages serves the public mirror. **`docs/` is never synced.** See §4 for the full pattern.
 
