@@ -11,8 +11,8 @@
 # - Files listed here should NOT be edited directly in a consumer project
 #   (changes get overwritten on next sync). To modify, open a PR against
 #   tnosugar/project-template and then re-run the sync in each consumer.
-# - INDEX.md files, CLAUDE.md, .sync-public.yml, README.md, docs/, website/,
-#   brand/ contents, and any project-specific files are intentionally NOT in
+# - INDEX.md files, CLAUDE.md, .sync-public.yml, README.md, content/, website/,
+#   files/ contents, and any project-specific files are intentionally NOT in
 #   this manifest — each project owns them.
 
 .claude/conventions.md

@@ -17,9 +17,10 @@ Project-specific content — purpose, snapshot, voice, frameworks, decisions, op
 
 ```
 {project}-private/
-├── CLAUDE.md                              # Project-specific spec (purpose, voice, frameworks, decisions)
+├── CLAUDE.md                              # Project-specific spec (purpose, voice, frameworks, decisions) — carries frontmatter
 ├── .claude/
 │   ├── conventions.md                     # This file — shared conventions (synced from project-template)
+│   ├── SCHEMA.md                          # Knowledge-graph schema (synced from project-template)
 │   └── sync-source.txt                    # Source repo URL for the sync script
 ├── .sync-public.yml                       # Manifest: which paths sync to the public mirror
 ├── .github/
@@ -28,65 +29,68 @@ Project-specific content — purpose, snapshot, voice, frameworks, decisions, op
 ├── scripts/
 │   ├── sync-conventions.sh                # Pulls shared files from project-template
 │   └── sync-manifest.txt                  # List of paths the sync script copies
-├── docs/                                  # PRIVATE ONLY — canonical written content
+├── content/                               # PRIVATE ONLY — all authored markdown: canonical prose, references, service defs, specs
 │   ├── INDEX.md
 │   └── home.md
 ├── website/                               # The project's website — served by Pages via the public mirror
 │   ├── INDEX.md
 │   └── home.html
-├── brand/                                 # Brand asset FILES (logos, palette, fonts) — guidelines in docs/brand/
+├── files/                                 # Non-markdown assets (logos, palette, fonts, photos, decks, PDFs) — flat by default
 │   └── INDEX.md
 └── [channel folders]                      # Created on demand — see "Top-level channel folders" below
 ```
 
 **The two halves of the repo.** This spec distinguishes private canonical content from channel deliverables:
 
-- **`docs/` is private by default and stays that way.** It holds canonical written content — strategy, research, briefs, decisions, all copy drafts and final approved text, brand guidelines, process docs. **Nothing in `docs/` is ever added to `.sync-public.yml`.** When Claude writes final text for a channel (e.g. a LinkedIn post), the text lives in `docs/copy/{channel}/`; only the rendered or published artifact (screenshot, archive PDF, scheduled send config) lives in the channel folder.
+- **`content/` is private by default and stays that way.** It holds every authored markdown file in the project: strategy, research, briefs, decisions, copy drafts, final approved text, brand guidelines, process docs, service definitions, reference sheets. **Nothing in `content/` is ever added to `.sync-public.yml`.** When Claude writes final text for a channel (e.g. a LinkedIn post), the text lives in `content/copy/{channel}/`; only the rendered or published artifact (screenshot, archive PDF, scheduled send config) lives in the channel folder.
 - **Channel folders (including `website/`) hold deliverables.** Each top-level folder corresponds to a distinct channel or asset type. Paths here are candidates for `.sync-public.yml` when the artifact is publicly publishable (typically just `website/` content, occasionally a public deck). Non-public channels (ads creative, internal email sends, drafts in progress) stay private by never being listed in the manifest.
+- **`files/` holds non-markdown raw assets.** Logos, palettes, fonts, icons, photos, decks, PDFs, any binary or structured-data asset the website or a channel references. Flat by default; subdirectories appear organically when a cluster of related files reaches enough mass to earn one (e.g. a `files/brand/` or `files/photos/` directory once more than a handful accumulate). No pre-declared subdirectory taxonomy.
 
 ### Top-level channel folders
 
 Created on demand. When a project needs a channel that doesn't yet exist, create the folder with an INDEX.md before adding content. Use these canonical names rather than synonyms:
 
 - **`website/`** — the project's primary web presence, served via GitHub Pages. One HTML file per page, shared main nav, single-file (see §2 Website Conventions).
-- **`brand/`** — brand asset FILES (`logo.svg`, `palette.json`, `fonts/`, `icons/`). Brand GUIDELINES (written voice, visual principles, usage rules) live in `docs/brand/` — this folder is just the physical assets every channel references with paths like `../brand/logo.svg`.
-- **`ads/`** — digital advertising. Organize by platform first: `ads/google/`, `ads/linkedin/`, `ads/meta/`. Each platform holds campaigns: `ads/google/q2-launch/`. Creative lives here; ad copy (canonical text) lives in `docs/copy/ads/`.
-- **`social/`** — social media posts. Organize by platform first: `social/linkedin/`, `social/x/`, `social/instagram/`. Each platform holds posts by campaign or chronologically. Post text (canonical) lives in `docs/copy/social/`.
-- **`email/`** — email campaigns. Rendered HTML templates, plain-text fallbacks, send logs. Campaign copy (canonical) lives in `docs/copy/email/`.
-- **`sms/`** — SMS campaigns. Message text (canonical) lives in `docs/copy/sms/`; send logs and per-platform configs live here.
+- **`files/`** — non-markdown raw assets the rest of the repo references: brand asset files (`logo.svg`, `palette.json`, `fonts/`, `icons/`, `favicon.ico`), photos, decks, PDFs, anything binary or structured-data. Flat by default; subdirectories grow organically (e.g. `files/brand/` once more than a handful of brand assets accumulate). Brand GUIDELINES (voice, visual principles, usage rules) live in `content/brand/` as markdown — `files/` is just the physical assets every channel references with paths like `../files/logo.svg`.
+- **`ads/`** — digital advertising. Organize by platform first: `ads/google/`, `ads/linkedin/`, `ads/meta/`. Each platform holds campaigns: `ads/google/q2-launch/`. Creative lives here; ad copy (canonical text) lives in `content/copy/ads/`.
+- **`social/`** — social media posts. Organize by platform first: `social/linkedin/`, `social/x/`, `social/instagram/`. Each platform holds posts by campaign or chronologically. Post text (canonical) lives in `content/copy/social/`.
+- **`email/`** — email campaigns. Rendered HTML templates, plain-text fallbacks, send logs. Campaign copy (canonical) lives in `content/copy/email/`.
+- **`sms/`** — SMS campaigns. Message text (canonical) lives in `content/copy/sms/`; send logs and per-platform configs live here.
 - **`messenger/`** — messenger (WhatsApp, iMessage, Messenger, etc.) assets and conversation flows.
-- **`decks/`** — slide decks (`.pptx`, `.pdf`). Outline and speaker notes (canonical) live in `docs/copy/decks/`.
+- **`decks/`** — slide decks (`.pptx`, `.pdf`). Outline and speaker notes (canonical) live in `content/copy/decks/`.
 - **`app/`** — application source code for marketing apps. Treat as a normal software project inside this folder.
 
 When a channel is needed that doesn't fit any of the above, add a new top-level folder following the same pattern (singular lowercase name, platform-then-campaign nesting, INDEX.md at every level) and log it in the project's `CLAUDE.md` §5 (Decisions Logged). If the new channel is broadly useful, open a PR against `project-template` to add it here so future projects inherit the name.
 
-### Canonical subfolders in docs/
+### Canonical subfolders in content/
 
-When `docs/` reaches the "split at three" threshold in a category, promote to a subfolder. Use these names:
+When `content/` reaches the "split at three" threshold in a category, promote to a subfolder. Use these names:
 
-- `docs/strategy/` — strategic positioning, market analysis, business framing
-- `docs/research/` — source material, interviews, reading notes, raw inputs
-- `docs/copy/` — all canonical text destined for external channels. Organize by channel: `docs/copy/social/`, `docs/copy/email/`, `docs/copy/ads/`, `docs/copy/decks/`, `docs/copy/website/`, `docs/copy/sms/`. Within social/ads/sms, nest by platform: `docs/copy/social/linkedin/post-q2-launch.md`.
-- `docs/briefs/` — short briefs that direct production work (deck briefs, campaign briefs, design briefs)
-- `docs/decisions/` — long-form decision records that exceed what fits in CLAUDE.md §5
-- `docs/brand/` — brand guidelines (voice, visual principles, usage rules). Asset files live in top-level `brand/`.
-- `docs/process/` — organizational process design docs (for internal/external communications)
+- `content/strategy/` — strategic positioning, market analysis, business framing
+- `content/research/` — source material, interviews, reading notes, raw inputs
+- `content/copy/` — all canonical text destined for external channels. Organize by channel: `content/copy/social/`, `content/copy/email/`, `content/copy/ads/`, `content/copy/decks/`, `content/copy/website/`, `content/copy/sms/`. Within social/ads/sms, nest by platform: `content/copy/social/linkedin/post-q2-launch.md`.
+- `content/briefs/` — short briefs that direct production work (deck briefs, campaign briefs, design briefs)
+- `content/decisions/` — long-form decision records that exceed what fits in CLAUDE.md §5
+- `content/brand/` — brand guidelines (voice, visual principles, usage rules). Asset files live in top-level `files/`.
+- `content/process/` — organizational process design docs (for internal/external communications)
+- `content/services/` — service definitions (one file per named offer; typical `type: reference, isa: [service]`).
+- `content/concepts/` — concept / framework stubs if a project ever wants its abstract types (Service, Framework, Method) represented as graph nodes. Optional; `isa:` values can be literal enums without corresponding files.
 
 ### Universal conventions
 
-**Split at three.** When a category at any level reaches three files, promote to a subfolder of the same canonical name and create an `INDEX.md` inside it. Applies inside `docs/`, inside any channel folder, inside any platform folder. Claude performs splits automatically when the threshold is crossed; if moved files are referenced from elsewhere or in the manifest, surface the move to the user first.
+**Split at three.** When a category at any level reaches three files, promote to a subfolder of the same canonical name and create an `INDEX.md` inside it. Applies inside `content/`, inside any channel folder, inside any platform folder. Claude performs splits automatically when the threshold is crossed; if moved files are referenced from elsewhere or in the manifest, surface the move to the user first.
 
-**Kebab-case filenames.** Files inside `docs/` use kebab-case (`brand-copy.md`, not `Brand Copy.md` or `brandCopy.md`). Same default for channel-folder artifacts unless a platform or ecosystem convention mandates otherwise (`LICENSE`, `README.md`, `CLAUDE.md`, `.sync-public.yml`, vendor-specific filenames). When renaming an existing file to match, use `git mv` so history is preserved, and update every reference (INDEX.md entries, `related:` frontmatter, body links, manifest paths) in the same commit.
+**Kebab-case filenames.** Files inside `content/` use kebab-case (`brand-copy.md`, not `Brand Copy.md` or `brandCopy.md`). Same default for channel-folder artifacts unless a platform or ecosystem convention mandates otherwise (`LICENSE`, `README.md`, `CLAUDE.md`, `.sync-public.yml`, vendor-specific filenames). When renaming an existing file to match, use `git mv` so history is preserved, and update every reference (INDEX.md entries, `related:` frontmatter, body links, manifest paths) in the same commit.
 
-**INDEX.md at every level.** Every folder under `docs/` and every channel folder has an `INDEX.md` listing its immediate contents (subfolders and files) with one-line descriptions, and pointing outward to child INDEX.md files. Updated whenever files are added, moved, or retired. Subfolders get their own INDEX.md the moment they're created.
+**INDEX.md at every level.** Every folder under `content/` and every channel folder has an `INDEX.md` listing its immediate contents (subfolders and files) with one-line descriptions, and pointing outward to child INDEX.md files. Updated whenever files are added, moved, or retired. Subfolders get their own INDEX.md the moment they're created.
 
-**Frontmatter on docs.** Every markdown file in `docs/` (excluding `INDEX.md` files) starts with a YAML frontmatter block. The schema has two layers: **core fields** (present on every doc) and **typed graph fields** (optional today, used where applicable; required for graph-relevant entities when the knowledge graph is built).
+**Frontmatter.** Every markdown file in `content/` (excluding `INDEX.md` files) AND the project's root `CLAUDE.md` starts with a YAML frontmatter block. (`CLAUDE.md` is treated as a Project entity in the graph — see SCHEMA.md §2 — so it carries frontmatter even though it sits at the repo root, not under `content/`.) The schema has two layers: **core fields** (present on every doc) and **typed graph fields** (optional today, used where applicable; required for graph-relevant entities when the knowledge graph is built).
 
 ```yaml
 ---
 # Core fields (present on every doc):
 title: Home page spec
-type: spec               # strategy | research | copy | brief | decision | brand | process | spec | log
+type: spec               # strategy | research | copy | brief | decision | brand | process | spec | log | reference
 status: draft            # draft | review | final | archived
 last_updated: 2026-04-18
 renders_to: [website/home.html]   # optional; omit if this doc has no rendered artifact
@@ -94,6 +98,7 @@ related: []              # see-also / peer associations that don't fit a typed e
 
 # Typed graph fields (optional; fill in when applicable):
 entity: project          # project | organization | person | content | topic | measurement
+isa: []                  # abstract classes the described subject belongs to (e.g. [service], [framework])
 client: []               # paths to organization entities this doc is for
 project: []              # paths to project entities this doc belongs to
 topics: []               # paths to topic entities this doc covers
@@ -102,11 +107,11 @@ published: 2026-04-19    # publication date of the artifact, distinct from last_
 ---
 ```
 
-`type:` matches the canonical subfolder this doc lives in (or would live in if split out); it describes what kind of *document* this is. `entity:` names what kind of *thing in the world* the doc represents; it is optional and only set on graph-relevant docs. `type:` and `entity:` sit at different levels and both can be present.
+`type:` matches the canonical subfolder this doc lives in (or would live in if split out); it describes what kind of *document* this is. `entity:` names what kind of *thing in the world* the doc represents; it is optional and only set on graph-relevant docs. `isa:` names the abstract class the subject of the doc belongs to, distinct from the doc's own genre — a Reference-type document about a Service carries `type: reference, isa: [service]`. `type:`, `entity:`, and `isa:` sit at different levels; any combination can be present.
 
-For `docs/copy/` entries specifically, a doc may also carry `channel:` (social | email | ads | sms | decks | website) and `platform:` (linkedin | x | google | meta | …) when those aren't already implicit in the path, useful for graph queries that span channels.
+For `content/copy/` entries specifically, a doc may also carry `channel:` (social | email | ads | sms | decks | website) and `platform:` (linkedin | x | google | meta | …) when those aren't already implicit in the path, useful for graph queries that span channels.
 
-The authoritative definitions of entity types, edge types, and per-entity required fields live in `.claude/SCHEMA.md`. This block shows the common shape; SCHEMA.md is the reference.
+The authoritative definitions of entity types, edge types, the `isa:` controlled vocabulary, and per-entity required fields live in `.claude/SCHEMA.md`. This block shows the common shape; SCHEMA.md is the reference.
 
 **Typed fields vs `related[]`.** If a relationship fits a typed field (`client:`, `topics:`, `project:`, `people:`, etc.), it goes in that field. `related[]` is the untyped fallback for peer associations that don't fit any named edge: "these two canonical docs are mutually relevant but not in a named semantic relationship." When a query tool walks the graph, typed fields give it named edges to traverse; `related[]` gives it "see also." Don't use `related[]` for things that have a typed home, or the typed edges silently get shadowed.
 
@@ -116,7 +121,7 @@ The authoritative definitions of entity types, edge types, and per-entity requir
 
 Update `last_updated` whenever the body changes meaningfully; update `published` only when the artifact goes (or re-goes) live.
 
-**Two-repo structure.** The working repo (`{project}-private`) holds everything produced; a paired public mirror (`{project}-public`) holds only the subset listed in `.sync-public.yml`. Pages serves the public mirror. **`docs/` is never synced.** See §4 for the full pattern.
+**Two-repo structure.** The working repo (`{project}-private`) holds everything produced; a paired public mirror (`{project}-public`) holds only the subset listed in `.sync-public.yml`. Pages serves the public mirror. **`content/` is never synced.** See §4 for the full pattern.
 
 ---
 
@@ -126,11 +131,11 @@ The `website/*.html` files are standalone, single-file HTML pages served by GitH
 
 - **Deployment model: a home page plus standalone explainers, connected by a shared main nav.** Each HTML file stands on its own — no server-side includes, no shared shell — but every page in `website/` carries the same top nav block (see "Main nav convention" below) so a reader can move between pages from any starting point. Pages may evolve into a more traditional site over time; until then they remain single-file and self-contained.
 - **Main nav convention.** Every HTML file in `website/` starts with the same nav. Left side is a text brand linking to `./home.html`. Right side is one link per sibling page (`./home.html`, `./<other-page>.html`, …). The current page marks its own item with `class="site-nav-link active" aria-current="page"`. CSS lives inline under a `/* ---------- Main nav ---------- */` block. If a page sets `body { padding }`, the nav uses negative margins to render edge-to-edge; otherwise regular padding. When a new page is added, extend the nav across all files.
-- **Internal links.** Use relative `./<page>.html` links between website pages. Website pages never link into `docs/` because `docs/` is private — never synced to the public mirror.
-- **Brand assets.** When a page needs a logo, palette value, or brand font file, reference it from `../brand/` (e.g. `<img src="../brand/logo.svg">`, `<link rel="icon" href="../brand/favicon.ico">`). Brand GUIDELINES that describe how to use those assets live in `docs/brand/` — not linked from website pages, since docs is private.
+- **Internal links.** Use relative `./<page>.html` links between website pages. Website pages never link into `content/` because `content/` is private — never synced to the public mirror.
+- **Brand assets.** When a page needs a logo, palette value, or brand font file, reference it from `../files/` (e.g. `<img src="../files/logo.svg">`, `<link rel="icon" href="../files/favicon.ico">`). Once enough brand assets accumulate to warrant a subdirectory, they move to `../files/brand/` and page references update accordingly. Brand GUIDELINES that describe how to use those assets live in `content/brand/` — not linked from website pages, since content is private.
 - **One file, no build step.** Inline `<style>` and `<script>`, single Google Fonts import (Inter by default), no external JS dependencies.
-- **Font:** Inter (300/400/500/600/700) with `system-ui, sans-serif` fallback — override with the project's brand typography once `brand/` and `docs/brand/` are filled in.
-- **Background:** `#f8fafc`. **Primary text:** `#0f172a`. **Muted text:** `#64748b` / `#94a3b8`. Override with the brand palette from `brand/palette.json` once defined.
+- **Font:** Inter (300/400/500/600/700) with `system-ui, sans-serif` fallback — override with the project's brand typography once `files/` and `content/brand/` are filled in.
+- **Background:** `#f8fafc`. **Primary text:** `#0f172a`. **Muted text:** `#64748b` / `#94a3b8`. Override with the brand palette from `files/palette.json` (or `files/brand/palette.json`) once defined.
 - **Diagrams in inline SVG**, with `onclick` handlers calling named JS functions that reveal a detail panel below the diagram (when interactivity is needed).
 - **Data lives in JS objects** at the top of the script block so copy edits are localized and obvious.
 - **Viewport-responsive**, with one `@media (max-width: 720px)` fallback where needed.
@@ -151,9 +156,9 @@ Practical implications:
 2. **Propose, don't assume.** When a decision is needed that isn't covered by this file or the project's `CLAUDE.md`, surface the decision explicitly with 2–3 reasoned options rather than picking silently.
 3. **Small steps, visible reasoning.** Prefer short cycles — draft a section, check alignment, expand — over one large generation.
 4. **Update the right spec as decisions land.** Project-specific decisions go into the project's `CLAUDE.md` (§5 Decisions Logged). Changes to shared conventions go into a PR against `tnosugar/project-template`, then propagate via `scripts/sync-conventions.sh`. Never edit `.claude/conventions.md` directly in a consumer project — the next sync will overwrite it.
-5. **Source-of-truth discipline.** Canonical written content lives in `docs/` (private, with frontmatter). Channel folders (`website/`, `ads/`, `social/`, `email/`, `decks/`, etc.) render or reference that canonical content. If a channel artifact drifts from its `docs/` source, update `docs/` first and bring the artifact into alignment, not the other way around. Keep each folder's `INDEX.md` current when files are added, moved, or retired. Never add `docs/` paths to `.sync-public.yml` — docs is private only.
-6. **Verify before declaring done.** For any non-trivial change, include a verification step: re-read the changed file, diff against the source `docs/` copy, or view the rendered HTML.
-7. **Retroactive application of voice rule changes.** When a voice or copy rule in `CLAUDE.md` §3 changes mid-project (e.g. a previously-allowed punctuation mark is banned, a spelling convention flips, a hedging rule tightens), the new rule applies retroactively to all existing client-facing copy — everything in channel folders (`website/`, `ads/`, `social/`, `email/`, `decks/`, …) and the canonical text in `docs/` that those channels render from. Internal spec files (`CLAUDE.md`, `.claude/conventions.md`, `INDEX.md` files, decision-log entries, frontmatter) are exempt unless the user explicitly asks for a sweep there too. The sweep is **never applied silently**. Claude drafts a full proposal first — per-file, line-by-line, showing the exact before/after change for every instance — and waits for explicit human approval before applying anything. The user may approve the whole proposal, approve a subset, or request revisions. The voice-change decision entry in `CLAUDE.md` §5 records the scope of what was swept (which files, how many instances) so the retroactive application is visible in the log.
+5. **Source-of-truth discipline.** Canonical written content lives in `content/` (private, with frontmatter). Channel folders (`website/`, `ads/`, `social/`, `email/`, `decks/`, etc.) render or reference that canonical content. If a channel artifact drifts from its `content/` source, update `content/` first and bring the artifact into alignment, not the other way around. Keep each folder's `INDEX.md` current when files are added, moved, or retired. Never add `content/` paths to `.sync-public.yml` — content is private only.
+6. **Verify before declaring done.** For any non-trivial change, include a verification step: re-read the changed file, diff against the source `content/` copy, or view the rendered HTML.
+7. **Retroactive application of voice rule changes.** When a voice or copy rule in `CLAUDE.md` §3 changes mid-project (e.g. a previously-allowed punctuation mark is banned, a spelling convention flips, a hedging rule tightens), the new rule applies retroactively to all existing client-facing copy — everything in channel folders (`website/`, `ads/`, `social/`, `email/`, `decks/`, …) and the canonical text in `content/` that those channels render from. Internal spec files (`CLAUDE.md`, `.claude/conventions.md`, `INDEX.md` files, decision-log entries, frontmatter) are exempt unless the user explicitly asks for a sweep there too. The sweep is **never applied silently**. Claude drafts a full proposal first — per-file, line-by-line, showing the exact before/after change for every instance — and waits for explicit human approval before applying anything. The user may approve the whole proposal, approve a subset, or request revisions. The voice-change decision entry in `CLAUDE.md` §5 records the scope of what was swept (which files, how many instances) so the retroactive application is visible in the log.
 
 ---
 

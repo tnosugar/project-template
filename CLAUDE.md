@@ -1,3 +1,13 @@
+---
+title: Project Template
+type: spec
+status: final
+last_updated: 2026-04-19
+related: []
+
+entity: project
+---
+
 # CLAUDE.md — [TBD — Project Name]
 
 This file is the **project-specific** working specification for the [TBD — project name] project.
@@ -82,9 +92,9 @@ Add to §5 (Decisions Logged) as decisions land during discovery.
 
 ### Step 6 — Update the README, manifest, and home assets
 
-- Replace `[TBD — Project Name]` markers throughout `README.md`, `docs/home.md`, and `website/home.html`.
-- Edit `.sync-public.yml` to reflect what should be public for this project (only channel-folder paths; `docs/` is private only).
-- Run a first pass on `docs/home.md` and `website/home.html` to fill in the placeholders that have firm answers.
+- Replace `[TBD — Project Name]` markers throughout `README.md`, `content/home.md`, and `website/home.html`. Fill in this `CLAUDE.md`'s frontmatter `title:` with the project name.
+- Edit `.sync-public.yml` to reflect what should be public for this project (only channel-folder paths; `content/` is private only).
+- Run a first pass on `content/home.md` and `website/home.html` to fill in the placeholders that have firm answers.
 
 ### Step 7 — Commit, push, verify
 
