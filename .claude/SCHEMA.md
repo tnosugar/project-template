@@ -55,7 +55,7 @@ Each entity type has a canonical name, a source (Schema.org-aligned or custom), 
 - **Source:** custom parent; specific content kinds map to Schema.org (`Article`, `BlogPosting`, `SocialMediaPosting`, `VideoObject`, etc.) when useful.
 - **Definition:** A discrete authored artifact: a published page, a LinkedIn post, a blog article, a podcast episode, an email, a deck, a video, OR an internal reference document, OR a service definition. The Content entity is the broad bucket for "this is a piece of authored prose"; `type:` carries the sub-flavor and `isa:` (when set) names the abstract class the subject belongs to.
 - **Typical `type:` values:** `copy` (canonical text of a published artifact), `reference` (lookup/canon material like brand-copy blocks, glossaries, voice guides, or service definitions), `process` (long-form description of how something works), `spec` (page spec or design spec), or a channel-specific value on rendered artifacts.
-- **Common `isa:` values when set:** `service`, `framework`, `method`, `pattern`, `voice_guide`, `reference_sheet` — see §3 for the full controlled vocabulary.
+- **Common `isa:` values when set:** `service`, `framework`, `method`, `pattern`, `voice_guide`, `reference_sheet`, `article` — see §3 for the full controlled vocabulary.
 - **Key fields:** `entity: content`, `type:` (one of the above), `isa: []` (optional), `client: []`, `project: []`, `topics: []`, `people: []` (authors, subjects), `published: YYYY-MM-DD`, `channel:`, `platform:`. Content entities often also carry `derived_from: []` (source content this was built from) and `measurements: []` (performance records); those fields are introduced when Content becomes a tracked entity type in a consumer project.
 - **Lives in:** anywhere under `content/`. Canonical text for channel artifacts in `content/copy/{channel}/[{platform}/]`; reference material in `content/brand/` or `content/services/` or alongside its peers; rendered artifact in the channel folder (`website/`, `social/`, etc.).
 
@@ -108,6 +108,7 @@ Bidirectionality is maintained by hand until a graph tool exists. When a graph t
 | `pattern` | The doc describes a recurring pattern or template applied across instances. | A doc on "how we structure Week 1 of a discovery engagement". |
 | `voice_guide` | The doc is a voice, tone, or copy reference used as raw material for generating other docs. | `brand-copy.md`-style reference sheets. |
 | `reference_sheet` | Generic catch-all for lookup tables (glossaries, stakeholder lists, color palettes described in prose, etc.) that don't fit a more specific class. | A glossary of internal terms. |
+| `article` | The doc is a catalog entry (metadata + editorial notes, not body text) for a published written artifact — a third-party publication piece, an owned-site blog post, or similar. Body text is typically not reproduced in the doc itself; the canonical URL points at the live artifact. | A catalog entry for a Psychology Today column piece or a Glinda's Edge blog post. |
 
 A doc does not need an `isa:` — leave it unset if no vocabulary value applies, and open a PR if a new value is warranted.
 
@@ -143,4 +144,4 @@ Consumer projects pull the change in via `scripts/sync-conventions.sh`.
 
 ---
 
-*Last updated: 2026-04-19. Six entity types at stub depth (Project, Organization, Person, Content, Topic, Measurement). Ten edge types including `isa:` (literal-enum abstract-class edge with a six-value controlled vocabulary: service, framework, method, pattern, voice_guide, reference_sheet). `type:` expanded to include `reference`. Three orthogonal classifier layers documented (`type:`, `entity:`, `isa:`). `CLAUDE.md` at project root carries Project-entity frontmatter.*
+*Last updated: 2026-04-20. Six entity types at stub depth (Project, Organization, Person, Content, Topic, Measurement). Ten edge types including `isa:` (literal-enum abstract-class edge with a seven-value controlled vocabulary: service, framework, method, pattern, voice_guide, reference_sheet, article). `type:` expanded to include `reference`. Three orthogonal classifier layers documented (`type:`, `entity:`, `isa:`). `CLAUDE.md` at project root carries Project-entity frontmatter.*
